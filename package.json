@@ -1,6 +1,6 @@
 {
   "name": "helmet-webpack-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generates HTML layout based on a JSON config file using React-Helmet",
   "main": "index.js",
   "scripts": {
