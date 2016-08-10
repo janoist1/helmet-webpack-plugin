@@ -9,7 +9,7 @@ class HelmetWebpackPlugin {
     excludeChunks: [],
     chunksSortMode: 'auto',
     filename: 'index.html',
-    props: {
+    helmetProps: {
       htmlAttributes: {},
       title: 'Title',
       defaultTitle: 'Default Title',
@@ -19,7 +19,7 @@ class HelmetWebpackPlugin {
       script: [],
       style: []
     },
-    root: <div id='root' />
+    rootProps: {id: 'root'}
   }
 
   /**
@@ -44,23 +44,21 @@ class HelmetWebpackPlugin {
       let styles = this.getStyles(chunks)
         .map(asset => ({
           rel: 'stylesheet',
-          href: `${asset}`
+          href: `/${asset}`
         }))
-      let props = {
-        ...this.options.props,
+      let helmetProps = {
+        ...this.options.helmetProps,
         link: [
-          ...this.options.props.link,
+          ...this.options.helmetProps.link,
           ...styles
         ]
       }
 
-      renderToStaticMarkup((<Helmet {...props} />))
+      renderToStaticMarkup((<Helmet {...helmetProps} />))
 
       let head = Helmet.rewind()
-      let root = typeof this.options.root === 'string'
-        ? <div id={this.options.root} />
-        : this.options.root
-      let html = renderHtmlLayout(head, [root, scripts])
+      let body = <div key="body" {...this.options.rootProps} />
+      let html = renderHtmlLayout(head, [body, scripts])
 
       this.addToAssets(html, compilation)
 
