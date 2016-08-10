@@ -57,7 +57,7 @@ Configuration
 You can pass a hash of configuration options to `HtmlWebpackPlugin`.
 Allowed values are as follows:
 
-- `props`: The props object that goes straight to react-helmet ([see more](https://github.com/nfl/react-helmet#use-cases)). Defaults:
+- `helmetProps`: The props object that goes straight to react-helmet ([see more](https://github.com/nfl/react-helmet#use-cases)). Defaults:
   - htmlAttributes: {},
   - title: 'Title',
   - defaultTitle: 'Default Title',
@@ -71,11 +71,13 @@ Allowed values are as follows:
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
-- `root`: The root element where your app will ue as a mount point. It can be a `string` or can be a React element: `<div className="someclass" id="someId" />`
+- `rootProps`: The props object that will be applied to the root element / mounting point of the app: `<div {...rootProps} />`
 
-Here's an example webpack config illustrating how to use these options:
+Here's an example:
+
+Let's put our default layout configuration into a file, for instance `config/layout.js`:
 ```javascript
-const layoutConfig = {
+export default {
   htmlAttributes: {lang: 'en'},
   title: 'Title',
   defaultTitle: 'Default Title',
@@ -90,8 +92,12 @@ const layoutConfig = {
   script: [],
   style: []
 }
+```
 
-// in your webpack config:
+Set something like this in your webpack config:
+```javascript
+import layout from '../config/layout'
+
 {
   entry: 'index.js',
   output: {
@@ -100,19 +106,22 @@ const layoutConfig = {
   },
   plugins: [
     new HelmetWebpackPlugin({
-      props: layoutConfig
+      helmetProps: layout
     })
   ]
 }
+```
 
-// somewhere in your server rendering routines:
+This code would be placed somewhere in your server rendering routines:
+```javascript
 import renderHtmlLayout from 'helmet-webpack-plugin'
+import layout from '../config/layout'
 
-// easy to do some server specific modification on the layout:
+// easy to do some server specific modification on the layout (can be really useful if you work with asset hashes):
 layoutConfig.link = Array.concat(layoutConfig.link, {rel: "stylesheet", href="http://some.more.stuff.com/style.css"})
 
 // anywhere in your components you can use react-helmet to modify the head section, but you need to include it at least once with the configuration as follows:
-let body = (
+let content = (
   <Provider store={store}>
     <div style={{ height: '100%' }}>
       <Helmet {...layoutConfig} />
@@ -123,8 +132,7 @@ let body = (
 let head = Helmet.rewind()
 
 response.status = 200
-response.body = renderHtmlLayout(head, [body, scripts])
-
+response.body = renderHtmlLayout(head, [<div {...rootProps} dangerouslySetInnerHTML={{__html: content}} />, scripts])
 ```
 
 # Contribution
