@@ -11,6 +11,7 @@ class HelmetWebpackPlugin {
     filename: 'index.html',
     helmetProps: {
       htmlAttributes: {},
+      bodyAttributes: {},
       title: 'Title',
       defaultTitle: 'Default Title',
       titleTemplate: '%s - Webpack App',
@@ -54,11 +55,9 @@ class HelmetWebpackPlugin {
         ]
       }
 
-      renderToStaticMarkup((<Helmet {...helmetProps} />))
-
       let head = Helmet.rewind()
       let body = <div key="body" {...this.options.rootProps} />
-      let html = renderHtmlLayout(head, [body, scripts])
+      let html = renderHtmlLayout(head, [body, scripts], helmetProps)
 
       this.addToAssets(html, compilation)
 
@@ -184,7 +183,7 @@ export default HelmetWebpackPlugin
  * @param scripts
  * @returns {string}
  */
-export function renderHtmlLayout (head, body) {
+export function renderHtmlLayout (head, body, helmetProps) {
   return '<!DOCTYPE html>' +
     renderToStaticMarkup(
       <html {...head.htmlAttributes.toComponent()}>
@@ -196,7 +195,7 @@ export function renderHtmlLayout (head, body) {
           {head.script.toComponent()}
           {head.style.toComponent()}
         </head>
-        <body>
+        <body {...helmetProps.bodyAttributes}>
           {body}
         </body>
       </html>
