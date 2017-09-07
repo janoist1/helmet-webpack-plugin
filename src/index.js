@@ -181,6 +181,7 @@ export default HelmetWebpackPlugin
  * @param head
  * @param body
  * @param scripts
+ * @param helmetProps
  * @returns {string}
  */
 export function renderHtmlLayout (head, body, helmetProps) {
